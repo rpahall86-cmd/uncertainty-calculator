@@ -1,4 +1,4 @@
-# Flask SymPy Uncertainty Backend
+# uncertainty calculator
 
 A class-based Flask backend using SymPy for symbolic evaluation and uncertainty propagation with support for any number of variables.
 
