@@ -32,7 +32,12 @@ function extractVariables(expr) {
 }
 
 function generateInputs() {
-  const expr = document.getElementById("expression").value;
+  const expr = document.getElementById("expression").value.trim();
+  if (!expr) {
+    alert("Enter an expression first.");
+    return;
+  }
+
   const vars = extractVariables(expr);
   const container = document.getElementById("variables");
   container.innerHTML = "";
@@ -49,28 +54,49 @@ function generateInputs() {
 }
 
 async function calculate() {
-  const expr = document.getElementById("expression").value;
-  const vars = extractVariables(expr);
+  const expr = document.getElementById("expression").value.trim();
+  if (!expr) {
+    alert("Expression is empty.");
+    return;
+  }
 
+  const vars = extractVariables(expr);
   let payload = { expression: expr, variables: {} };
 
-  vars.forEach(v => {
+  for (const v of vars) {
+    const valueInput = document.getElementById(`${v}_value`);
+    const uncInput = document.getElementById(`${v}_unc`);
+
+    if (!valueInput || !uncInput) {
+      alert("Click 'Set Variables' AFTER entering the final expression.");
+      return;
+    }
+
     payload.variables[v] = {
-      value: parseFloat(document.getElementById(`${v}_value`).value),
-      uncertainty: parseFloat(document.getElementById(`${v}_unc`).value)
+      value: parseFloat(valueInput.value),
+      uncertainty: parseFloat(uncInput.value)
     };
-  });
+  }
 
-  const res = await fetch("https://uncertainty-calculator.onrender.com", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  });
+  try {
+    const res = await fetch(
+      "https://uncertainty-calculator.onrender.com/calculate",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      }
+    );
 
-  const data = await res.json();
-  document.getElementById("output").textContent =
-    JSON.stringify(data, null, 2);
+    const text = await res.text();
+    document.getElementById("output").textContent = text;
+
+  } catch (err) {
+    console.error(err);
+    alert("Failed to contact backend.");
+  }
 }
 </script>
+
 </body>
 </html>
