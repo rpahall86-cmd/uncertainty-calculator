@@ -54,6 +54,7 @@ function generateInputs() {
 }
 
 async function calculate() {
+  console.log("CALCULATE CLICKED");
   const expr = document.getElementById("expression").value.trim();
   if (!expr) {
     alert("Expression is empty.");
@@ -79,6 +80,7 @@ async function calculate() {
   }
 
   try {
+    console.log("POSTING TO /calculate");
     const res = await fetch(
       "https://uncertainty-calculator.onrender.com/calculate",
       {
