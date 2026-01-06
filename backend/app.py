@@ -4,6 +4,8 @@ from models.expression_model import SymbolicExpression
 from services.symbolic_engine import SymbolicEngine
 from services.uncertainty import UncertaintyAnalyzer
 
+app = Flask(__name__)
+
 class AnalysisAPI:
     def __init__(self):
         self.app = Flask(__name__)
