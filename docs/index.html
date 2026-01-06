@@ -1,38 +1,76 @@
-<!-- rebuild -->
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>Uncertainty Calculator</title>
+  <style>
+    body { font-family: Arial; max-width: 700px; margin: auto; }
+    input { margin: 4px; }
+    .var-block { margin-bottom: 8px; }
+    pre { background: #f4f4f4; padding: 10px; }
+  </style>
 </head>
+
 <body>
+  <h1>Uncertainty Calculator</h1>
 
-<h2>Uncertainty Calculator</h2>
+  <label>Expression:</label><br>
+  <input id="expression" placeholder="e.g. x*y + z" size="40">
+  <button onclick="generateInputs()">Set Variables</button>
 
-<button onclick="calculate()">Calculate</button>
+  <div id="variables"></div>
 
-<pre id="output"></pre>
+  <button onclick="calculate()">Calculate</button>
+
+  <h3>Result</h3>
+  <pre id="output"></pre>
 
 <script>
-async function calculate() {
-  const response = await fetch(
-    "https://uncertainty-calculator.onrender.com",
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        expression: "x*y + z**2",
-        values: { x: 2, y: 3, z: 4 },
-        uncertainties: { x: 0.1, y: 0.2, z: 0.05 }
-      })
-    }
-  );
+function extractVariables(expr) {
+  const matches = expr.match(/[a-zA-Z]+/g) || [];
+  return [...new Set(matches)];
+}
 
-  const data = await response.json();
+function generateInputs() {
+  const expr = document.getElementById("expression").value;
+  const vars = extractVariables(expr);
+  const container = document.getElementById("variables");
+  container.innerHTML = "";
+
+  vars.forEach(v => {
+    container.innerHTML += `
+      <div class="var-block">
+        <strong>${v}</strong><br>
+        value: <input id="${v}_value" type="number" step="any">
+        uncertainty: <input id="${v}_unc" type="number" step="any">
+      </div>
+    `;
+  });
+}
+
+async function calculate() {
+  const expr = document.getElementById("expression").value;
+  const vars = extractVariables(expr);
+
+  let payload = { expression: expr, variables: {} };
+
+  vars.forEach(v => {
+    payload.variables[v] = {
+      value: parseFloat(document.getElementById(`${v}_value`).value),
+      uncertainty: parseFloat(document.getElementById(`${v}_unc`).value)
+    };
+  });
+
+  const res = await fetch("https://uncertainty-calculator.onrender.com", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+
+  const data = await res.json();
   document.getElementById("output").textContent =
     JSON.stringify(data, null, 2);
 }
 </script>
-
 </body>
 </html>
-
