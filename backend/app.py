@@ -11,6 +11,7 @@ def health():
     return {"status": "ok"}
 
 @app.route("/calculate", methods=["POST"])
+@app.route("/calculate", methods=["POST"])
 def calculate():
     data = request.json
 
@@ -19,11 +20,9 @@ def calculate():
         variables=data["variables"]
     )
 
-    value = calculator.evaluate()
-    uncertainty = calculator.propagate_uncertainty()
-
     return jsonify({
         "expression": data["expression"],
-        "value": value,
-        "uncertainty": uncertainty
+        "value": calculator.evaluate(),
+        "uncertainty": calculator.propagate_uncertainty(),
+        "partials": calculator.symbolic_derivatives()
     })

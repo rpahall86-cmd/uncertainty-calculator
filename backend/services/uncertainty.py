@@ -43,3 +43,10 @@ class UncertaintyCalculator:
             variance += (partial_val * sigma) ** 2
 
         return float(sp.sqrt(variance))
+
+    def symbolic_derivatives(self):
+        """Return symbolic partial derivatives."""
+        return {
+            name: str(sp.diff(self.expression, symbol))
+            for name, symbol in self.symbols.items()
+        }
