@@ -12,6 +12,10 @@ def health():
 
 @app.route("/calculate", methods=["POST"])
 @app.route("/calculate", methods=["POST"])
+@app.route("/", methods=["GET"])
+def health_check():
+    return {"status": "running"}
+
 def calculate():
     data = request.json
 
