@@ -2,31 +2,34 @@ import sympy as sp
 
 class UncertaintyCalculator:
     def __init__(self, expression: str, variables: dict, use_degrees: bool = False):
-        """
-        expression: string, e.g. "x*y + z" or "sin(x)"
-        variables: {
-            "x": {"value": 2.0, "uncertainty": 0.1},
-            "y": {"value": 3.0, "uncertainty": 0.2}
-        }
-        use_degrees: bool (convert trig inputs from degrees to radians)
-        """
         self.expression_str = expression
         self.variables = variables
         self.use_degrees = use_degrees
 
-        # Create symbols
+        # 1️⃣ Create symbols (UNCHANGED)
         self.symbols = {
             name: sp.Symbol(name) for name in variables.keys()
         }
 
-        # Parse expression
+        # 2️⃣ Parse expression string → SymPy expression
         expr = sp.sympify(self.expression_str)
 
-        # Convert degrees → radians if requested
+        # ======================================================
+        # 🔥 THIS IS WHERE AUTO-NORMALIZATION GOES 🔥
+        # ======================================================
         if self.use_degrees:
-            for name, symbol in self.symbols.items():
-                expr = expr.subs(symbol, symbol * sp.pi / 180)
+            trig_functions = (sp.sin, sp.cos, sp.tan)
 
+            for func in trig_functions:
+                expr = expr.replace(
+                    lambda e: e.func == func,
+                    lambda e: func(e.args[0] * sp.pi / 180)
+                )
+        # ======================================================
+        # 🔥 END OF AUTO-NORMALIZATION 🔥
+        # ======================================================
+
+        # 3️⃣ Store the final normalized expression
         self.expression = expr
 
     def evaluate(self):
