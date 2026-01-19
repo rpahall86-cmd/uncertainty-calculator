@@ -19,6 +19,10 @@
   <button onclick="generateInputs()">Set Variables</button>
 
   <div id="variables"></div>
+  <label>
+  <input type="checkbox" id="degrees">
+  Use degrees
+  </label>
 
   <button onclick="calculate()">Calculate</button>
 
@@ -88,6 +92,7 @@ async function calculate() {
       uncertainty: parseFloat(uncInput.value)
     };
   }
+payload.use_degrees = document.getElementById("degrees").checked;
 
   try {
     console.log("POSTING TO /calculate");
