@@ -27,9 +27,19 @@
 
 <script>
 function extractVariables(expr) {
+  const knownFunctions = [
+    "sin", "cos", "tan",
+    "asin", "acos", "atan",
+    "log", "ln", "sqrt", "exp"
+  ];
+
   const matches = expr.match(/[a-zA-Z]+/g) || [];
-  return [...new Set(matches)];
+
+  return [...new Set(
+    matches.filter(v => !knownFunctions.includes(v))
+  )];
 }
+
 
 function generateInputs() {
   const expr = document.getElementById("expression").value.trim();
